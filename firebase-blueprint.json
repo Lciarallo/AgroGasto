@@ -1,0 +1,144 @@
+{
+  "entities": {
+    "PropertyConfig": {
+      "title": "PropertyConfig",
+      "description": "Configurações da propriedade rural incluindo setores, subgrupos e formas de pagamento",
+      "type": "object",
+      "properties": {
+        "propertyName": {
+          "type": "string",
+          "description": "Nome da fazenda ou propriedade rural",
+          "maxLength": 100
+        },
+        "sectors": {
+          "type": "array",
+          "description": "Lista de setores da propriedade rural"
+        },
+        "paymentMethods": {
+          "type": "array",
+          "description": "Lista de formas de pagamento aceitas (com opção de cartão de crédito e dia de vencimento)"
+        },
+        "lastBackupDate": {
+          "type": "string",
+          "description": "Data ISO do último backup realizado"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp da última atualização"
+        }
+      },
+      "required": ["propertyName", "sectors", "paymentMethods"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Lançamento individual de gasto rural (à vista ou parcela)",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "Data do gasto ou vencimento da parcela no formato YYYY-MM-DD",
+          "maxLength": 10
+        },
+        "description": {
+          "type": "string",
+          "description": "Descrição detalhada do gasto",
+          "maxLength": 250
+        },
+        "amount": {
+          "type": "number",
+          "description": "Valor do lançamento/parcela em Reais"
+        },
+        "sectorId": {
+          "type": "string",
+          "description": "Identificador do setor",
+          "maxLength": 100
+        },
+        "sectorName": {
+          "type": "string",
+          "description": "Nome do setor",
+          "maxLength": 100
+        },
+        "subgroupId": {
+          "type": "string",
+          "description": "Identificador do subgrupo",
+          "maxLength": 100
+        },
+        "subgroupName": {
+          "type": "string",
+          "description": "Nome do subgrupo",
+          "maxLength": 100
+        },
+        "paymentMethodId": {
+          "type": "string",
+          "description": "Identificador da forma de pagamento",
+          "maxLength": 100
+        },
+        "paymentMethodName": {
+          "type": "string",
+          "description": "Nome da forma de pagamento",
+          "maxLength": 100
+        },
+        "notes": {
+          "type": "string",
+          "description": "Observações adicionais ou dados fiscais",
+          "maxLength": 500
+        },
+        "parcelamentoId": {
+          "type": "string",
+          "description": "Identificador comum de todas as parcelas de uma mesma compra",
+          "maxLength": 100
+        },
+        "numeroParcela": {
+          "type": "number",
+          "description": "Número da parcela atual (ex.: 2)"
+        },
+        "totalParcelas": {
+          "type": "number",
+          "description": "Total de parcelas da compra (ex.: 5)"
+        },
+        "valorTotalCompra": {
+          "type": "number",
+          "description": "Valor total original da compra parcelada"
+        },
+        "dataCompra": {
+          "type": "string",
+          "description": "Data original da compra no formato YYYY-MM-DD",
+          "maxLength": 10
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp ISO de criação"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp ISO de atualização"
+        }
+      },
+      "required": [
+        "date",
+        "description",
+        "amount",
+        "sectorId",
+        "sectorName",
+        "subgroupId",
+        "subgroupName",
+        "paymentMethodId",
+        "paymentMethodName"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/config/propriedade": {
+      "schema": {
+        "$ref": "PropertyConfig"
+      },
+      "description": "Configurações da propriedade do usuário"
+    },
+    "/users/{userId}/gastos/{expenseId}": {
+      "schema": {
+        "$ref": "Expense"
+      },
+      "description": "Lançamentos de despesas do usuário"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Test connection doc used on boot
+    match /test/connection {
+      allow get: if true;
+    }
+
+    // Regras de isolamento estrito por usuário:
+    // Cada usuário só pode ler e gravar seus próprios dados sob /users/{userId}/...
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Configurações da propriedade rural (nome, setores, subgrupos, formas de pagamento)
+      match /config/{configDoc} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Lançamentos individuais de gastos da propriedade
+      match /gastos/{expenseId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Bloqueia qualquer outro caminho por padrão
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

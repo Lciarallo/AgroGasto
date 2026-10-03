@@ -1,0 +1,8 @@
+{
+  "name": "Remix AgroGasto - Controle de Despesas Rurais",
+  "description": "Aplicativo ágil e responsivo para lançamento e gestão de gastos de propriedades rurais, com setores, subgrupos, formas de pagamento, relatórios e exportação.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
