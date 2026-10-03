@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   ExpenseRecord,
   PropertySettings,
@@ -6,9 +6,11 @@ import {
   ActiveTab,
   PeriodFilterOption,
   InstallmentScope,
+  ExpenseFormOrigin,
 } from './types';
 import { DEFAULT_SETTINGS, loadSettings } from './utils/storage';
 import { useAuth } from './firebase/AuthContext';
+import { withExpenseWriteFeedback } from './firebase/expenseWriteFeedback';
 import {
   subscribeToPropertyConfig,
   savePropertyConfig,
@@ -57,6 +59,9 @@ export default function App() {
   // Modal States
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<ExpenseRecord | null>(null);
+  const [formOrigin, setFormOrigin] = useState<ExpenseFormOrigin | null>(null);
+  const [recentlySavedIds, setRecentlySavedIds] = useState<string[]>([]);
+  const recentSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [deletingExpense, setDeletingExpense] = useState<ExpenseRecord | null>(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
 
@@ -75,6 +80,20 @@ export default function App() {
   const showToast = (text: string, type: 'success' | 'error' = 'success') => {
     setToastMessage({ text, type });
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  useEffect(() => () => {
+    if (recentSaveTimer.current) clearTimeout(recentSaveTimer.current);
+  }, []);
+
+  const markSavedExpenses = (records: ExpenseRecord[]) => {
+    if (recentSaveTimer.current) clearTimeout(recentSaveTimer.current);
+    setRecentlySavedIds(records.map((record) => record.id));
+    recentSaveTimer.current = setTimeout(() => setRecentlySavedIds([]), 8000);
+  };
+
+  const handleLateSyncError = () => {
+    showToast('A sincronização do lançamento falhou. Confira os dados e tente novamente.', 'error');
   };
 
   // Filter State (defaults to 'this_month')
@@ -198,6 +217,12 @@ export default function App() {
       console.error('Erro ao salvar configurações:', err);
       showToast('Erro ao salvar configurações na nuvem.', 'error');
     }
+  };
+
+  const handleUpdateSettingsFromForm = async (newSettings: PropertySettings) => {
+    if (!user) throw new Error('Entre novamente para salvar.');
+    await savePropertyConfig(user.uid, newSettings);
+    setSettings(newSettings);
   };
 
   // 1. Synchronized rename: Sector with writeBatch in Firestore
@@ -340,26 +365,28 @@ export default function App() {
 
   // Create or Update Single Expense in Firestore
   const handleSaveExpense = async (record: ExpenseRecord) => {
-    if (!user) return;
-    try {
-      await saveExpenseToFirestore(user.uid, record);
-      showToast('Lançamento salvo na nuvem!');
-    } catch (err) {
-      console.error('Erro ao salvar gasto:', err);
-      showToast('Erro ao gravar lançamento.', 'error');
-    }
+    if (!user) throw new Error('Entre novamente para salvar.');
+    const result = await withExpenseWriteFeedback(
+      user.uid,
+      record,
+      () => saveExpenseToFirestore(user.uid, record),
+      handleLateSyncError
+    );
+    markSavedExpenses([record]);
+    return result;
   };
 
   // Create Installment Expenses Batch in Firestore (writeBatch)
   const handleSaveExpenseBatch = async (records: ExpenseRecord[]) => {
-    if (!user) return;
-    try {
-      await saveExpensesBatchToFirestore(user.uid, records);
-      showToast(`${records.length} parcelas salvas em lote na nuvem!`);
-    } catch (err) {
-      console.error('Erro ao salvar parcelas em lote:', err);
-      showToast('Erro ao gravar parcelas.', 'error');
-    }
+    if (!user || records.length === 0) throw new Error('Não foi possível salvar as parcelas.');
+    const result = await withExpenseWriteFeedback(
+      user.uid,
+      records[0],
+      () => saveExpensesBatchToFirestore(user.uid, records),
+      handleLateSyncError
+    );
+    markSavedExpenses(records);
+    return result;
   };
 
   // Update Installment Series according to scope ('single' | 'this_and_next' | 'all')
@@ -369,20 +396,21 @@ export default function App() {
     newTotalPurchaseAmount: number,
     dueDay?: number
   ) => {
-    if (!user) return;
-    try {
-      await updateInstallmentSeriesInFirestore(
+    if (!user) throw new Error('Entre novamente para salvar.');
+    const result = await withExpenseWriteFeedback(
+      user.uid,
+      editedExpense,
+      () => updateInstallmentSeriesInFirestore(
         user.uid,
         editedExpense,
         scope,
         newTotalPurchaseAmount,
         dueDay
-      );
-      showToast('Parcelamento atualizado na nuvem!');
-    } catch (err) {
-      console.error('Erro ao atualizar série de parcelas:', err);
-      showToast('Erro ao atualizar parcelas.', 'error');
-    }
+      ),
+      handleLateSyncError
+    );
+    markSavedExpenses([editedExpense]);
+    return result;
   };
 
   // Delete Expense or Installment Series from Firestore
@@ -426,12 +454,19 @@ export default function App() {
   };
 
   // Quick Open Modal
-  const handleOpenNewExpense = () => {
+  const rememberFormOrigin = (element?: HTMLButtonElement) => {
+    const rect = element?.getBoundingClientRect();
+    setFormOrigin(rect ? { x: rect.x, y: rect.y, width: rect.width, height: rect.height } : null);
+  };
+
+  const handleOpenNewExpense = (event?: React.MouseEvent<HTMLButtonElement>) => {
+    rememberFormOrigin(event?.currentTarget);
     setEditingExpense(null);
     setIsFormOpen(true);
   };
 
-  const handleOpenEditExpense = (expense: ExpenseRecord) => {
+  const handleOpenEditExpense = (expense: ExpenseRecord, trigger?: HTMLButtonElement) => {
+    rememberFormOrigin(trigger);
     setEditingExpense(expense);
     setIsFormOpen(true);
   };
@@ -554,6 +589,7 @@ export default function App() {
       {/* Toast Notification */}
       {toastMessage && (
         <div
+          role={toastMessage.type === 'error' ? 'alert' : 'status'}
           className={`fixed top-20 right-4 z-50 px-4 py-2.5 rounded-xl shadow-lg border flex items-center gap-2 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-2 ${
             toastMessage.type === 'success'
               ? 'bg-stone-900 text-white border-stone-700'
@@ -630,6 +666,7 @@ export default function App() {
                 onEdit={handleOpenEditExpense}
                 onDeleteRequest={setDeletingExpense}
                 onOpenNewExpense={handleOpenNewExpense}
+                recentlySavedIds={recentlySavedIds}
               />
             )}
           </div>
@@ -714,8 +751,10 @@ export default function App() {
         onSaveBatch={handleSaveExpenseBatch}
         onUpdateInstallmentSeries={handleUpdateInstallmentSeries}
         initialData={editingExpense}
+        origin={formOrigin}
+        isOffline={isOffline}
         settings={settings}
-        onUpdateSettings={handleUpdateSettings}
+        onUpdateSettings={handleUpdateSettingsFromForm}
       />
 
       {/* Export to Excel / CSV Modal */}

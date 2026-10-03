@@ -1,14 +1,15 @@
 import React from 'react';
 import { ExpenseRecord } from '../types';
 import { formatCurrency, formatDateBR } from '../utils/formatters';
-import { Edit2, Trash2, Calendar, FileQuestion, Plus, Sparkles, CreditCard } from 'lucide-react';
+import { Edit2, Trash2, Calendar, FileQuestion, Plus, Sparkles, CreditCard, Check } from 'lucide-react';
 
 interface ExpenseListProps {
   expenses: ExpenseRecord[];
   totalAllCount: number;
-  onEdit: (expense: ExpenseRecord) => void;
+  onEdit: (expense: ExpenseRecord, trigger?: HTMLButtonElement) => void;
   onDeleteRequest: (expense: ExpenseRecord) => void;
-  onOpenNewExpense: () => void;
+  onOpenNewExpense: (event?: React.MouseEvent<HTMLButtonElement>) => void;
+  recentlySavedIds?: string[];
 }
 
 export const ExpenseList: React.FC<ExpenseListProps> = ({
@@ -17,6 +18,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
   onEdit,
   onDeleteRequest,
   onOpenNewExpense,
+  recentlySavedIds = [],
 }) => {
   if (expenses.length === 0) {
     const isAppCompletelyEmpty = totalAllCount === 0;
@@ -76,7 +78,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
           return (
             <div
               key={expense.id}
-              className="bg-white rounded-xl border border-stone-200/90 hover:border-emerald-600/40 p-4 transition-all shadow-xs hover:shadow-sm"
+              className={`bg-white rounded-xl border border-stone-200/90 hover:border-emerald-600/40 p-4 transition-colors ${recentlySavedIds.includes(expense.id) ? 'expense-just-saved' : ''}`}
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 {/* Main Content */}
@@ -93,6 +95,12 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                     <span className="text-stone-600">{expense.subgroupName}</span>
                     <span aria-hidden="true" className="text-stone-300">·</span>
                     <span className="text-stone-500">{expense.paymentMethodName}</span>
+                    {recentlySavedIds.includes(expense.id) && (
+                      <span className="inline-flex items-center gap-1 text-emerald-800 font-semibold">
+                        <Check className="w-3.5 h-3.5" aria-hidden="true" />
+                        Salvo
+                      </span>
+                    )}
                     {installmentBadgeText && (
                       <span
                         className="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 font-mono font-bold text-[11px] border border-emerald-200"
@@ -140,7 +148,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                   {/* Actions buttons */}
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => onEdit(expense)}
+                    onClick={(event) => onEdit(expense, event.currentTarget)}
                       className="min-h-[40px] px-2.5 py-1.5 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 font-medium text-xs flex items-center gap-1 transition-colors cursor-pointer"
                       title="Editar lançamento"
                     >

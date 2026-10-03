@@ -48,20 +48,20 @@ Aplicativo web progressivo e responsivo desenvolvido especialmente para produtor
 ## 📦 Como Executar Localmente
 
 ### Pré-requisitos
-- Node.js (versão 18 ou superior)
+- Node.js 22.12 ou superior
 - npm, yarn ou pnpm
 
 ### Passos
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
-   cd SEU_REPOSITORIO
+   git clone https://github.com/Lciarallo/AgroGasto.git
+   cd AgroGasto
    ```
 
 2. **Instale as dependências:**
    ```bash
-   npm install
+   npm ci
    ```
 
 3. **Inicie o servidor de desenvolvimento:**
@@ -81,6 +81,18 @@ Aplicativo web progressivo e responsivo desenvolvido especialmente para produtor
    ```
 
 ---
+
+## Publicar no Firebase
+
+O AgroGasto usa um site de Hosting próprio em **https://agrogasto.web.app**, no projeto Firebase `bmtv-jornalismo-web`. A configuração em `.firebaserc` direciona o Hosting exclusivamente ao site `agrogasto`.
+
+Depois de instalar o Firebase CLI e autenticar com `firebase login`, publique com:
+
+```bash
+firebase deploy --project bmtv-jornalismo-web --only hosting:agrogasto,firestore:rules
+```
+
+O deploy verifica os tipos e gera o build antes de enviar `dist/`. As regras configuradas em `firebase.json` se aplicam apenas ao banco nomeado do AgroGasto, `ai-studio-remixagrogastoco-7b024771-0fc0-4ccf-8435-b47c5719320f`. Os domínios `agrogasto.web.app` e `agrogasto.firebaseapp.com` precisam estar autorizados no Firebase Authentication para o login Google.
 
 ## 📤 Como Enviar para o seu GitHub
 

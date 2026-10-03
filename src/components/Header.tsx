@@ -5,7 +5,7 @@ import { Plus, FileSpreadsheet, Settings, ReceiptText, BarChart3, WifiOff, Refre
 interface HeaderProps {
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
-  onOpenNewExpense: () => void;
+  onOpenNewExpense: (event?: React.MouseEvent<HTMLButtonElement>) => void;
   onOpenExport: () => void;
   propertyName: string;
   isOffline?: boolean;
@@ -72,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <ReceiptText className="w-4 h-4 text-emerald-400" />
-            Lançamentos
+            <span className="sr-only xl:not-sr-only">Lançamentos</span>
           </button>
 
           <button
@@ -84,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <BarChart3 className="w-4 h-4 text-emerald-400" />
-            Totais & Relatório
+            <span className="sr-only xl:not-sr-only">Totais & Relatório</span>
           </button>
 
           <button
@@ -96,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <Settings className="w-4 h-4 text-emerald-400" />
-            Configurações
+            <span className="sr-only xl:not-sr-only">Configurações</span>
           </button>
         </nav>
 

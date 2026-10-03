@@ -5,6 +5,11 @@
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
 
+  /* Icons keep their declared dimensions when adjacent text wraps. */
+  .lucide {
+    flex-shrink: 0;
+  }
+
   /* Safe area padding for mobile notches and bottom bars */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 16px);

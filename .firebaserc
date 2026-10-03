@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "bmtv-jornalismo-web"
+  },
+  "targets": {
+    "bmtv-jornalismo-web": {
+      "hosting": {
+        "agrogasto": ["agrogasto"]
+      }
+    }
+  }
+}

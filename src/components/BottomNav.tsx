@@ -5,7 +5,7 @@ import { ReceiptText, BarChart3, Settings, Plus, FileSpreadsheet } from 'lucide-
 interface BottomNavProps {
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
-  onOpenNewExpense: () => void;
+  onOpenNewExpense: (event?: React.MouseEvent<HTMLButtonElement>) => void;
   onOpenExport: () => void;
 }
 

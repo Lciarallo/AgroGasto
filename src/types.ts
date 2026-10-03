@@ -40,6 +40,18 @@ export interface ExpenseRecord {
 
 export type InstallmentScope = 'single' | 'this_and_next' | 'all';
 
+export interface ExpenseSaveResult {
+  status: 'synced' | 'pending';
+  completion?: Promise<void>;
+}
+
+export interface ExpenseFormOrigin {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface PropertySettings {
   propertyName: string;
   sectors: SectorItem[];

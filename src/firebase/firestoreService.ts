@@ -313,7 +313,7 @@ export async function updateInstallmentSeriesInFirestore(
       .sort((a, b) => (a.data.numeroParcela || 1) - (b.data.numeroParcela || 1));
 
     const batch = writeBatch(db);
-    const nowIso = new Date().toISOString();
+    const nowIso = editedExpense.updatedAt;
     const baseDesc = stripInstallmentSuffix(editedExpense.description);
     const totalParcelas = editedExpense.totalParcelas || allDocs.length;
 

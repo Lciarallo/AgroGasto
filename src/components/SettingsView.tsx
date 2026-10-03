@@ -477,11 +477,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Conta de Usuário (Google Auth) */}
       <div className="bg-white rounded-2xl border border-stone-200/90 p-5 sm:p-6 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 font-bold">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 shrink-0 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 font-bold">
               <User className="w-5 h-5" />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <span className="text-xs font-semibold text-stone-500 block uppercase tracking-wider">
                 Conta Conectada (Google)
               </span>
@@ -503,11 +503,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* Propriedade Rural: Nome */}
       <div className="bg-white rounded-2xl border border-stone-200/90 p-5 sm:p-6 shadow-xs">
-        <div className="flex items-center gap-2.5 mb-3">
-          <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
+        <div className="flex items-center gap-2.5 mb-3 min-w-0">
+          <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
             <Building className="w-4 h-4" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <h3 className="text-base font-bold text-stone-900 leading-tight">
               Identificação da Propriedade
             </h3>
@@ -538,11 +538,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Gerenciamento de Setores e Subgrupos */}
       <div className="bg-white rounded-2xl border border-stone-200/90 p-5 sm:p-6 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-200">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
               <Layers className="w-4 h-4" />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <h3 className="text-base font-bold text-stone-900 leading-tight">
                 Setores & Subgrupos da Propriedade
               </h3>
@@ -673,8 +673,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         {/* Subgroups of the selected sector */}
         {currentSector && (
           <div className="pt-4 border-t border-stone-100 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0 flex-1">
                 <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider">
                   Subgrupos vinculados ao setor: <span className="text-emerald-800">{currentSector.name}</span>
                 </h4>
@@ -685,7 +685,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
               <button
                 onClick={() => setShowAddSubgroup(!showAddSubgroup)}
-                className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shrink-0 whitespace-nowrap"
               >
                 <Plus className="w-3 h-3" />
                 <span>Novo Subgrupo</span>
@@ -796,11 +796,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Gerenciamento de Formas de Pagamento */}
       <div className="bg-white rounded-2xl border border-stone-200/90 p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-200">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
               <CreditCard className="w-4 h-4" />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <h3 className="text-base font-bold text-stone-900 leading-tight">
                 Formas de Pagamento
               </h3>
